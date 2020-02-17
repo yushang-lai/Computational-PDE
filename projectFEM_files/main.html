@@ -1,0 +1,924 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0149)file:///C:/Users/Yushang/Desktop/New%20folder%20%282%29/yushang%20project41/yushang%20project41/yushang%20project41/yushang%20project4/html/main.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>main</title><meta name="generator" content="MATLAB 9.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-12-14"><meta name="DC.source" content="main.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">% Multigrid</span>
+L  = 3;
+h  = 1/2^L;
+hx = 1;
+ii = 50000;
+w  = 0.5;
+<span class="comment">% Step 1 Weighted Jacobi &amp; Gasuss-Seidel Smoother</span>
+
+<span class="comment">% Weighter Jacobi</span>
+
+u     = zeros(hx/h+1,hx/h+1);
+u_w_j = Smoother_Weighted_Jaco(h,hx,u,ii,w);
+u_g_s = Smoother_Gauss_Seidel1(h,hx,u,ii);
+
+ii1   = 10;
+ii2   = 11;
+ii3   = 12;
+ii4   = 13;
+
+u_g_s_1 = Smoother_Gauss_Seidel1(h,hx,u,ii1);
+u_g_s_2 = Smoother_Gauss_Seidel1(h,hx,u,ii2);
+u_g_s_3 = Smoother_Gauss_Seidel1(h,hx,u,ii3);
+u_g_s_4 = Smoother_Gauss_Seidel1(h,hx,u,ii4);
+
+k1_k  = max(max((u_g_s_4-u_g_s_3)));
+k_k1  = max(max((u_g_s_3-u_g_s_2)));
+k1_k2 = max(max((u_g_s_2-u_g_s_1)));
+disp(<span class="string">'The convergence rate is:'</span>);
+q     = log(abs(k1_k/k_k1))/log(abs(k_k1/k1_k2))
+
+
+<span class="comment">% Plot the error for h = 1/16</span>
+figure(1);
+L  = 4;
+h  = 1/2^L;
+u     = zeros(hx/h+1,hx/h+1);
+err_lst =  Smoother_Gauss_Seidel_alpha(h,hx,u,ii);
+subplot(2,2,1);
+plot([3:3:42],err_lst)
+title(<span class="string">'h=1/16 error plot'</span>)
+
+
+<span class="comment">% Get Step number for h=1/4</span>
+L  = 2;
+h  = 1/2^L;
+u  = zeros(hx/h+1,hx/h+1);
+disp(<span class="string">'The step required to get h^2 error h = 1/4 is:'</span>);
+nstep1 =  Smoother_Gauss_Seidel_belta(h,hx,u,ii)
+
+
+<span class="comment">% Get Step number for h = 1/128</span>
+L  = 7;
+h  = 1/2^L;
+u  = zeros(hx/h+1,hx/h+1);
+disp(<span class="string">'The step required to get h^2 error h = 1/128 is:'</span>);
+nstep2 =  Smoother_Gauss_Seidel_belta(h,hx,u,ii)
+
+L  = 1;
+h  = 1/2^L;
+u  = zeros(hx/h+1,hx/h+1);
+nstep3 =  Smoother_Gauss_Seidel_belta(h,hx,u,ii);
+
+L  = 6;
+h  = 1/2^L;
+u  = zeros(hx/h+1,hx/h+1);
+nstep4 =  Smoother_Gauss_Seidel_belta(h,hx,u,ii);
+
+subplot(2,2,2);
+plot([1 2 6 7],[nstep3 nstep1 nstep4 nstep2],<span class="string">"o"</span>);
+xlabel(<span class="string">'L'</span>)
+ylabel(<span class="string">'*# steps'</span>)
+title(<span class="string">'# of steps r.p.t L '</span>)
+
+<span class="comment">% Choose a random initial guess and plot the error in the first three steps</span>
+L  = 4;
+h  = 1/2^L;
+u  = zeros(hx/h+1,hx/h+1);
+[err_lst, rando] =  Smoother_Gauss_Seidel_gamma(h,hx,u,ii);
+subplot(2,2,3);
+plot([1 2 3],err_lst);
+title(<span class="string">'random start'</span>)
+
+<span class="comment">% Step 2 Two-Grid Method</span>
+
+figure(2);
+subplot(2,1,1);
+L  = 2;
+h  = 1/2^L;
+hx = 1;
+u  = zeros(hx/h+1,hx/h+1);
+u_g_s_1 = Smoother_Gauss_Seidel1(h,hx,u,10000);
+J = 2;
+mu = 10;
+f  = h^2*ones((hx/h+1));
+err_lst1 = [];
+<span class="keyword">for</span> i =1:10
+    u = two_grid(u,f,J,mu);
+    err_lst1 = [err_lst1 abs(max(max(u(2:end-1,2:end-1)-u_g_s_1)))];
+<span class="keyword">end</span>
+plot(err_lst1);
+title(<span class="string">'h=1/4'</span>);
+
+subplot(2,1,2);
+L  = 7;
+h  = 1/2^L;
+hx = 1;
+u  = zeros(hx/h+1,hx/h+1);
+u_g_s_2 = Smoother_Gauss_Seidel1(h,hx,u,10000);
+J = 2;
+mu = 10;
+f  = h^2*ones((hx/h+1));
+err_lst2 = [];
+<span class="keyword">for</span> i =1:10
+    u = two_grid(u,f,J,mu);
+    err_lst2 = [err_lst2 abs(max(max(u(2:end-1,2:end-1)-u_g_s_2)))];
+<span class="keyword">end</span>
+
+plot(err_lst2);
+title(<span class="string">'h=1/128'</span>);
+
+<span class="comment">% Step 3 Vcycle</span>
+figure(3)
+L  = 7;
+h  = 1/2^L;
+mu = 10;
+hx = 1;
+u2  = zeros(hx/h+1,hx/h+1);
+error =1;
+tol = 0.1*h^2;
+J = 4;
+f  = h^2*ones((hx/h+1));
+u_g_s_2 = Smoother_Gauss_Seidel1(h,hx,u2,10000);
+kk =1;
+error_lst = [];
+<span class="keyword">while</span> error &gt; tol
+    u2 = Vcycle1(u2,J);
+    kk = kk+1;
+    error = abs(max(max(u2(2:end-1,2:end-1)-u_g_s_2)));
+    error_lst = [error_lst error];
+<span class="keyword">end</span>
+plot(error_lst);
+title(<span class="string">"V cycle"</span>)
+
+
+
+
+<span class="comment">% Multigrid on Hierarchical Grids</span>
+<span class="comment">% Step 1</span>
+[node,elem] = circlemesh(0,0,1,0.25);
+J = 4;
+HB_cell       = cell(J,1);
+bdNode_cell   = cell(J,1);
+freeNode_cell = cell(J,1);
+
+<span class="keyword">for</span> i = 1:J
+    [node,elem,~,HB] = uniformrefine(node,elem);
+    HB_cell{i}       = double(HB);
+    [bdNode,bdEdge,isBdNode,isBdElem]       = findboundary(elem);
+    freeNode                                = find(~isBdNode);
+    bdNode_cell{i}                          = bdNode;
+    freeNode_cell{i}                        = freeNode;
+<span class="keyword">end</span>
+<span class="comment">%[node,elem,~,HB] = uniformrefine(node,elem);</span>
+<span class="comment">%[elem,HB,~] = uniformcoarsenred(elem);</span>
+figure(4);
+<span class="comment">% Step 2</span>
+<span class="comment">% showmesh(node,elem);</span>
+N                                       =  length(node);
+mid1                                    = (node(elem(:,2),:)+node(elem(:,3),:))/2;
+mid2                                    = (node(elem(:,3),:)+node(elem(:,1),:))/2;
+mid3                                    = (node(elem(:,1),:)+node(elem(:,2),:))/2;
+area0                                   = assembling_area(node,elem);
+bt1                                     = area0.*(f1(mid2)+f1(mid3))/6;
+bt2                                     = area0.*(f1(mid3)+f1(mid1))/6;
+bt3                                     = area0.*(f1(mid1)+f1(mid2))/6;
+b                                       = accumarray(elem(:),[bt1;bt2;bt3],[N 1]);
+
+[bdNode,bdEdge,isBdNode,isBdElem]       = findboundary(elem);
+freeNode                                = find(~isBdNode);
+u                                       = zeros(N,1);
+u                                       = rand(N,1);
+u(bdNode)                               = g_D(node(bdNode,:));
+A                                       = assembling(node,elem);
+
+A_cell                                  = cell(J,1);
+A_cell{J}                               = A;
+A_new                                   = A;
+A_tril                                  = cell(J,1);
+A_triu                                  = cell(J,1);
+A_tril{J}                               = tril(A_new);
+A_triu{J}                               = triu(A_new);
+A_pro                                   = cell(J,1);
+A_res                                   = cell(J,1);
+
+<span class="keyword">for</span> i = J-1:-1:2
+    pro                                 = prolongation_HB1(HB_cell{i+1});
+    res                                 = pro';
+    A_pro{i+1}                          = pro;
+    A_res{i+1}                          = res;
+    A_new                               = res*A_new*pro;
+    A_cell{i}                           = A_new;
+    A_tril{i}                           = tril(A_new);
+    A_triu{i}                           = triu(A_new);
+<span class="keyword">end</span>
+
+i =1;
+pro                                     = prolongation_HB1(HB_cell{i+1});
+res                                     = pro';
+A_pro{2}                                = pro;
+A_res{2}                                = res;
+A_cell{1}                               = res*A_new*pro;
+
+r_list = [];
+
+<span class="keyword">for</span> i = 1:30
+    r                                       = b - A*u;
+    r_list                                  = [r_list max(abs(r))];
+    e                                       = Vcycle(r,J,A_cell,A_tril,A_triu,A_pro,A_res,bdNode_cell,freeNode_cell);
+    u                                       = u+e;
+<span class="keyword">end</span>
+semilogy(r_list)
+title(<span class="string">"semilogy plot for rand initial condition J = 4"</span>)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+figure(5);
+
+time_list_three = [];
+time_list_four = [];
+time_list_five = [];
+time_list_six = [];
+
+<span class="keyword">for</span> J = 3:6
+
+    [node,elem] = circlemesh(0,0,1,0.25);
+    HB_cell       = cell(J,1);
+    bdNode_cell   = cell(J,1);
+    freeNode_cell = cell(J,1);
+
+    <span class="keyword">for</span> i = 1:J
+        [node,elem,~,HB] = uniformrefine(node,elem);
+        HB_cell{i}       = double(HB);
+        [bdNode,bdEdge,isBdNode,isBdElem]       = findboundary(elem);
+        freeNode                                = find(~isBdNode);
+        bdNode_cell{i}                          = bdNode;
+        freeNode_cell{i}                        = freeNode;
+    <span class="keyword">end</span>
+    <span class="comment">%[node,elem,~,HB] = uniformrefine(node,elem);</span>
+    <span class="comment">%[elem,HB,~] = uniformcoarsenred(elem);</span>
+    <span class="comment">% Step 2</span>
+    <span class="comment">% showmesh(node,elem);</span>
+    N                                       =  length(node);
+    mid1                                    = (node(elem(:,2),:)+node(elem(:,3),:))/2;
+    mid2                                    = (node(elem(:,3),:)+node(elem(:,1),:))/2;
+    mid3                                    = (node(elem(:,1),:)+node(elem(:,2),:))/2;
+    area0                                   = assembling_area(node,elem);
+    bt1                                     = area0.*(f1(mid2)+f1(mid3))/6;
+    bt2                                     = area0.*(f1(mid3)+f1(mid1))/6;
+    bt3                                     = area0.*(f1(mid1)+f1(mid2))/6;
+    b                                       = accumarray(elem(:),[bt1;bt2;bt3],[N 1]);
+
+    [bdNode,bdEdge,isBdNode,isBdElem]       = findboundary(elem);
+    freeNode                                = find(~isBdNode);
+    u                                       = zeros(N,1);
+    u                                       = rand(N,1);
+    u(bdNode)                               = g_D(node(bdNode,:));
+    A                                       = assembling(node,elem);
+
+    A_cell                                  = cell(J,1);
+    A_cell{J}                               = A;
+    A_new                                   = A;
+    A_tril                                  = cell(J,1);
+    A_triu                                  = cell(J,1);
+    A_tril{J}                               = tril(A_new);
+    A_triu{J}                               = triu(A_new);
+    A_pro                                   = cell(J,1);
+    A_res                                   = cell(J,1);
+
+    <span class="keyword">for</span> i = J-1:-1:2
+        pro                                 = prolongation_HB1(HB_cell{i+1});
+        res                                 = pro';
+        A_pro{i+1}                          = pro;
+        A_res{i+1}                          = res;
+        A_new                               = res*A_new*pro;
+        A_cell{i}                           = A_new;
+        A_tril{i}                           = tril(A_new);
+        A_triu{i}                           = triu(A_new);
+    <span class="keyword">end</span>
+
+    i =1;
+    pro                                     = prolongation_HB1(HB_cell{i+1});
+    res                                     = pro';
+    A_pro{2}                                = pro;
+    A_res{2}                                = res;
+    A_cell{1}                               = res*A_new*pro;
+
+
+    <span class="keyword">for</span> i = 1:30
+        tic;
+        r                                       = b - A*u;
+        r_list                                  = [r_list max(abs(r))];
+        e                                       = Vcycle(r,J,A_cell,A_tril,A_triu,A_pro,A_res,bdNode_cell,freeNode_cell);
+        u                                       = u+e;
+        toc;
+        t1                                      = toc;
+        <span class="keyword">if</span> J == 3
+            <span class="keyword">if</span> i == 1
+                time_list_three = [t1];
+            <span class="keyword">else</span>
+                time_list_three = [time_list_three t1+time_list_three(end)];
+            <span class="keyword">end</span>
+        <span class="keyword">elseif</span> J == 4
+            <span class="keyword">if</span> i == 1
+                time_list_four = [t1];
+            <span class="keyword">else</span>
+                time_list_four = [time_list_four t1+time_list_four(end)];
+            <span class="keyword">end</span>
+        <span class="keyword">elseif</span> J == 5
+            <span class="keyword">if</span> i == 1
+                time_list_five = [t1];
+            <span class="keyword">else</span>
+                time_list_five = [time_list_five t1+time_list_five(end)];
+            <span class="keyword">end</span>
+        <span class="keyword">else</span>
+            <span class="keyword">if</span> i == 1
+                time_list_six = [t1];
+            <span class="keyword">else</span>
+                time_list_six = [time_list_six t1+time_list_six(end)];
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+<span class="keyword">end</span>
+
+plot(time_list_three)
+hold <span class="string">on</span>;
+plot(time_list_four)
+plot(time_list_five)
+plot(time_list_six)
+legend(<span class="string">"three"</span>,<span class="string">"four"</span>,<span class="string">"five"</span>,<span class="string">"six"</span>);
+title(<span class="string">"time vers J = 3,4,5,6"</span>)
+</pre><pre class="codeoutput">The convergence rate is:
+
+q =
+
+    1.0029
+
+The step required to get h^2 error h = 1/4 is:
+
+nstep1 =
+
+     1
+
+The step required to get h^2 error h = 1/128 is:
+
+nstep2 =
+
+   168
+
+Elapsed time is 0.002338 seconds.
+Elapsed time is 0.002055 seconds.
+Elapsed time is 0.002269 seconds.
+Elapsed time is 0.001878 seconds.
+Elapsed time is 0.002596 seconds.
+Elapsed time is 0.001673 seconds.
+Elapsed time is 0.001639 seconds.
+Elapsed time is 0.001672 seconds.
+Elapsed time is 0.001615 seconds.
+Elapsed time is 0.001720 seconds.
+Elapsed time is 0.001890 seconds.
+Elapsed time is 0.001764 seconds.
+Elapsed time is 0.001675 seconds.
+Elapsed time is 0.001657 seconds.
+Elapsed time is 0.001649 seconds.
+Elapsed time is 0.001626 seconds.
+Elapsed time is 0.001609 seconds.
+Elapsed time is 0.001633 seconds.
+Elapsed time is 0.001611 seconds.
+Elapsed time is 0.001828 seconds.
+Elapsed time is 0.001939 seconds.
+Elapsed time is 0.001693 seconds.
+Elapsed time is 0.001606 seconds.
+Elapsed time is 0.001621 seconds.
+Elapsed time is 0.001620 seconds.
+Elapsed time is 0.001601 seconds.
+Elapsed time is 0.001630 seconds.
+Elapsed time is 0.001600 seconds.
+Elapsed time is 0.001921 seconds.
+Elapsed time is 0.001878 seconds.
+Elapsed time is 0.006891 seconds.
+Elapsed time is 0.007442 seconds.
+Elapsed time is 0.006481 seconds.
+Elapsed time is 0.007128 seconds.
+Elapsed time is 0.006607 seconds.
+Elapsed time is 0.007831 seconds.
+Elapsed time is 0.006761 seconds.
+Elapsed time is 0.007041 seconds.
+Elapsed time is 0.006802 seconds.
+Elapsed time is 0.006671 seconds.
+Elapsed time is 0.007083 seconds.
+Elapsed time is 0.006578 seconds.
+Elapsed time is 0.007027 seconds.
+Elapsed time is 0.006926 seconds.
+Elapsed time is 0.006528 seconds.
+Elapsed time is 0.006744 seconds.
+Elapsed time is 0.006569 seconds.
+Elapsed time is 0.006870 seconds.
+Elapsed time is 0.006596 seconds.
+Elapsed time is 0.006474 seconds.
+Elapsed time is 0.006979 seconds.
+Elapsed time is 0.006568 seconds.
+Elapsed time is 0.006768 seconds.
+Elapsed time is 0.006586 seconds.
+Elapsed time is 0.006560 seconds.
+Elapsed time is 0.006918 seconds.
+Elapsed time is 0.006518 seconds.
+Elapsed time is 0.006805 seconds.
+Elapsed time is 0.006465 seconds.
+Elapsed time is 0.006677 seconds.
+Elapsed time is 0.043478 seconds.
+Elapsed time is 0.042260 seconds.
+Elapsed time is 0.041288 seconds.
+Elapsed time is 0.044540 seconds.
+Elapsed time is 0.041826 seconds.
+Elapsed time is 0.050139 seconds.
+Elapsed time is 0.045922 seconds.
+Elapsed time is 0.043164 seconds.
+Elapsed time is 0.042664 seconds.
+Elapsed time is 0.042680 seconds.
+Elapsed time is 0.042720 seconds.
+Elapsed time is 0.045083 seconds.
+Elapsed time is 0.044230 seconds.
+Elapsed time is 0.044262 seconds.
+Elapsed time is 0.044701 seconds.
+Elapsed time is 0.041440 seconds.
+Elapsed time is 0.043841 seconds.
+Elapsed time is 0.042987 seconds.
+Elapsed time is 0.044071 seconds.
+Elapsed time is 0.043734 seconds.
+Elapsed time is 0.042036 seconds.
+Elapsed time is 0.042674 seconds.
+Elapsed time is 0.044141 seconds.
+Elapsed time is 0.054959 seconds.
+Elapsed time is 0.045677 seconds.
+Elapsed time is 0.045348 seconds.
+Elapsed time is 0.046566 seconds.
+Elapsed time is 0.043246 seconds.
+Elapsed time is 0.044161 seconds.
+Elapsed time is 0.047380 seconds.
+Elapsed time is 0.232045 seconds.
+Elapsed time is 0.229836 seconds.
+Elapsed time is 0.233912 seconds.
+Elapsed time is 0.229256 seconds.
+Elapsed time is 0.228205 seconds.
+Elapsed time is 0.224172 seconds.
+Elapsed time is 0.229841 seconds.
+Elapsed time is 0.223592 seconds.
+Elapsed time is 0.225903 seconds.
+Elapsed time is 0.218802 seconds.
+Elapsed time is 0.217477 seconds.
+Elapsed time is 0.216856 seconds.
+Elapsed time is 0.219975 seconds.
+Elapsed time is 0.229734 seconds.
+Elapsed time is 0.226923 seconds.
+Elapsed time is 0.227647 seconds.
+Elapsed time is 0.225653 seconds.
+Elapsed time is 0.228169 seconds.
+Elapsed time is 0.236839 seconds.
+Elapsed time is 0.255438 seconds.
+Elapsed time is 0.228093 seconds.
+Elapsed time is 0.218817 seconds.
+Elapsed time is 0.222826 seconds.
+Elapsed time is 0.222637 seconds.
+Elapsed time is 0.220563 seconds.
+Elapsed time is 0.223170 seconds.
+Elapsed time is 0.220496 seconds.
+Elapsed time is 0.220204 seconds.
+Elapsed time is 0.220443 seconds.
+Elapsed time is 0.221294 seconds.
+</pre><img vspace="5" hspace="5" src="./main_files/main_01.png" alt=""> <img vspace="5" hspace="5" src="./main_files/main_02.png" alt=""> <img vspace="5" hspace="5" src="./main_files/main_03.png" alt=""> <img vspace="5" hspace="5" src="./main_files/main_04.png" alt=""> <img vspace="5" hspace="5" src="./main_files/main_05.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB® R2018b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% Multigrid
+L  = 3;
+h  = 1/2^L;
+hx = 1;
+ii = 50000;
+w  = 0.5;
+% Step 1 Weighted Jacobi & Gasuss-Seidel Smoother 
+
+% Weighter Jacobi 
+
+u     = zeros(hx/h+1,hx/h+1);
+u_w_j = Smoother_Weighted_Jaco(h,hx,u,ii,w);
+u_g_s = Smoother_Gauss_Seidel1(h,hx,u,ii); 
+
+ii1   = 10;
+ii2   = 11;
+ii3   = 12;
+ii4   = 13;
+
+u_g_s_1 = Smoother_Gauss_Seidel1(h,hx,u,ii1); 
+u_g_s_2 = Smoother_Gauss_Seidel1(h,hx,u,ii2); 
+u_g_s_3 = Smoother_Gauss_Seidel1(h,hx,u,ii3); 
+u_g_s_4 = Smoother_Gauss_Seidel1(h,hx,u,ii4); 
+
+k1_k  = max(max((u_g_s_4-u_g_s_3)));
+k_k1  = max(max((u_g_s_3-u_g_s_2)));
+k1_k2 = max(max((u_g_s_2-u_g_s_1)));
+disp('The convergence rate is:');
+q     = log(abs(k1_k/k_k1))/log(abs(k_k1/k1_k2))
+
+
+% Plot the error for h = 1/16
+figure(1);
+L  = 4;
+h  = 1/2^L;
+u     = zeros(hx/h+1,hx/h+1);
+err_lst =  Smoother_Gauss_Seidel_alpha(h,hx,u,ii);
+subplot(2,2,1);
+plot([3:3:42],err_lst)
+title('h=1/16 error plot')
+
+
+% Get Step number for h=1/4
+L  = 2;
+h  = 1/2^L;
+u  = zeros(hx/h+1,hx/h+1);
+disp('The step required to get h^2 error h = 1/4 is:');
+nstep1 =  Smoother_Gauss_Seidel_belta(h,hx,u,ii)
+
+
+% Get Step number for h = 1/128
+L  = 7;
+h  = 1/2^L;
+u  = zeros(hx/h+1,hx/h+1);
+disp('The step required to get h^2 error h = 1/128 is:');
+nstep2 =  Smoother_Gauss_Seidel_belta(h,hx,u,ii)
+
+L  = 1;
+h  = 1/2^L;
+u  = zeros(hx/h+1,hx/h+1);
+nstep3 =  Smoother_Gauss_Seidel_belta(h,hx,u,ii);
+
+L  = 6;
+h  = 1/2^L;
+u  = zeros(hx/h+1,hx/h+1);
+nstep4 =  Smoother_Gauss_Seidel_belta(h,hx,u,ii);
+
+subplot(2,2,2);
+plot([1 2 6 7],[nstep3 nstep1 nstep4 nstep2],"o");
+xlabel('L')
+ylabel('*# steps')
+title('# of steps r.p.t L ')
+
+% Choose a random initial guess and plot the error in the first three steps
+L  = 4;
+h  = 1/2^L;
+u  = zeros(hx/h+1,hx/h+1);
+[err_lst, rando] =  Smoother_Gauss_Seidel_gamma(h,hx,u,ii);
+subplot(2,2,3);
+plot([1 2 3],err_lst);
+title('random start')
+
+% Step 2 Two-Grid Method
+
+figure(2);
+subplot(2,1,1);
+L  = 2;
+h  = 1/2^L;
+hx = 1;
+u  = zeros(hx/h+1,hx/h+1);
+u_g_s_1 = Smoother_Gauss_Seidel1(h,hx,u,10000);
+J = 2;
+mu = 10;
+f  = h^2*ones((hx/h+1));
+err_lst1 = [];
+for i =1:10
+    u = two_grid(u,f,J,mu);
+    err_lst1 = [err_lst1 abs(max(max(u(2:end-1,2:end-1)-u_g_s_1)))];
+end
+plot(err_lst1);
+title('h=1/4');
+
+subplot(2,1,2);
+L  = 7;
+h  = 1/2^L;
+hx = 1;
+u  = zeros(hx/h+1,hx/h+1);
+u_g_s_2 = Smoother_Gauss_Seidel1(h,hx,u,10000);
+J = 2;
+mu = 10;
+f  = h^2*ones((hx/h+1));
+err_lst2 = [];
+for i =1:10
+    u = two_grid(u,f,J,mu);
+    err_lst2 = [err_lst2 abs(max(max(u(2:end-1,2:end-1)-u_g_s_2)))];
+end
+
+plot(err_lst2);
+title('h=1/128');
+
+% Step 3 Vcycle
+figure(3)
+L  = 7;
+h  = 1/2^L;
+mu = 10;
+hx = 1;
+u2  = zeros(hx/h+1,hx/h+1);
+error =1;
+tol = 0.1*h^2;
+J = 4;
+f  = h^2*ones((hx/h+1));
+u_g_s_2 = Smoother_Gauss_Seidel1(h,hx,u2,10000);
+kk =1;
+error_lst = [];
+while error > tol
+    u2 = Vcycle1(u2,J);
+    kk = kk+1;
+    error = abs(max(max(u2(2:end-1,2:end-1)-u_g_s_2)));
+    error_lst = [error_lst error];
+end
+plot(error_lst);
+title("V cycle")
+
+
+
+
+% Multigrid on Hierarchical Grids
+% Step 1
+[node,elem] = circlemesh(0,0,1,0.25);
+J = 4;
+HB_cell       = cell(J,1);
+bdNode_cell   = cell(J,1);
+freeNode_cell = cell(J,1);
+
+for i = 1:J
+    [node,elem,~,HB] = uniformrefine(node,elem);
+    HB_cell{i}       = double(HB);
+    [bdNode,bdEdge,isBdNode,isBdElem]       = findboundary(elem);
+    freeNode                                = find(~isBdNode);
+    bdNode_cell{i}                          = bdNode;
+    freeNode_cell{i}                        = freeNode;
+end
+%[node,elem,~,HB] = uniformrefine(node,elem);
+%[elem,HB,~] = uniformcoarsenred(elem);
+figure(4);
+% Step 2
+% showmesh(node,elem);
+N                                       =  length(node);
+mid1                                    = (node(elem(:,2),:)+node(elem(:,3),:))/2;
+mid2                                    = (node(elem(:,3),:)+node(elem(:,1),:))/2;
+mid3                                    = (node(elem(:,1),:)+node(elem(:,2),:))/2;
+area0                                   = assembling_area(node,elem);
+bt1                                     = area0.*(f1(mid2)+f1(mid3))/6;
+bt2                                     = area0.*(f1(mid3)+f1(mid1))/6;
+bt3                                     = area0.*(f1(mid1)+f1(mid2))/6;
+b                                       = accumarray(elem(:),[bt1;bt2;bt3],[N 1]);
+
+[bdNode,bdEdge,isBdNode,isBdElem]       = findboundary(elem);
+freeNode                                = find(~isBdNode);
+u                                       = zeros(N,1);
+u                                       = rand(N,1);
+u(bdNode)                               = g_D(node(bdNode,:));
+A                                       = assembling(node,elem);
+
+A_cell                                  = cell(J,1);
+A_cell{J}                               = A;
+A_new                                   = A;
+A_tril                                  = cell(J,1);
+A_triu                                  = cell(J,1);
+A_tril{J}                               = tril(A_new);
+A_triu{J}                               = triu(A_new);
+A_pro                                   = cell(J,1);
+A_res                                   = cell(J,1);
+
+for i = J-1:-1:2
+    pro                                 = prolongation_HB1(HB_cell{i+1});
+    res                                 = pro';
+    A_pro{i+1}                          = pro;
+    A_res{i+1}                          = res;
+    A_new                               = res*A_new*pro;
+    A_cell{i}                           = A_new;
+    A_tril{i}                           = tril(A_new);
+    A_triu{i}                           = triu(A_new);
+end
+
+i =1;
+pro                                     = prolongation_HB1(HB_cell{i+1});
+res                                     = pro';
+A_pro{2}                                = pro;
+A_res{2}                                = res;
+A_cell{1}                               = res*A_new*pro;
+
+r_list = [];
+
+for i = 1:30
+    r                                       = b - A*u;
+    r_list                                  = [r_list max(abs(r))];
+    e                                       = Vcycle(r,J,A_cell,A_tril,A_triu,A_pro,A_res,bdNode_cell,freeNode_cell);
+    u                                       = u+e;
+end
+semilogy(r_list)
+title("semilogy plot for rand initial condition J = 4")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+figure(5);
+
+time_list_three = [];
+time_list_four = [];
+time_list_five = [];
+time_list_six = [];
+
+for J = 3:6
+    
+    [node,elem] = circlemesh(0,0,1,0.25);
+    HB_cell       = cell(J,1);
+    bdNode_cell   = cell(J,1);
+    freeNode_cell = cell(J,1);
+
+    for i = 1:J
+        [node,elem,~,HB] = uniformrefine(node,elem);
+        HB_cell{i}       = double(HB);
+        [bdNode,bdEdge,isBdNode,isBdElem]       = findboundary(elem);
+        freeNode                                = find(~isBdNode);
+        bdNode_cell{i}                          = bdNode;
+        freeNode_cell{i}                        = freeNode;
+    end
+    %[node,elem,~,HB] = uniformrefine(node,elem);
+    %[elem,HB,~] = uniformcoarsenred(elem);
+    % Step 2
+    % showmesh(node,elem);
+    N                                       =  length(node);
+    mid1                                    = (node(elem(:,2),:)+node(elem(:,3),:))/2;
+    mid2                                    = (node(elem(:,3),:)+node(elem(:,1),:))/2;
+    mid3                                    = (node(elem(:,1),:)+node(elem(:,2),:))/2;
+    area0                                   = assembling_area(node,elem);
+    bt1                                     = area0.*(f1(mid2)+f1(mid3))/6;
+    bt2                                     = area0.*(f1(mid3)+f1(mid1))/6;
+    bt3                                     = area0.*(f1(mid1)+f1(mid2))/6;
+    b                                       = accumarray(elem(:),[bt1;bt2;bt3],[N 1]);
+
+    [bdNode,bdEdge,isBdNode,isBdElem]       = findboundary(elem);
+    freeNode                                = find(~isBdNode);
+    u                                       = zeros(N,1);
+    u                                       = rand(N,1);
+    u(bdNode)                               = g_D(node(bdNode,:));
+    A                                       = assembling(node,elem);
+
+    A_cell                                  = cell(J,1);
+    A_cell{J}                               = A;
+    A_new                                   = A;
+    A_tril                                  = cell(J,1);
+    A_triu                                  = cell(J,1);
+    A_tril{J}                               = tril(A_new);
+    A_triu{J}                               = triu(A_new);
+    A_pro                                   = cell(J,1);
+    A_res                                   = cell(J,1);
+
+    for i = J-1:-1:2
+        pro                                 = prolongation_HB1(HB_cell{i+1});
+        res                                 = pro';
+        A_pro{i+1}                          = pro;
+        A_res{i+1}                          = res;
+        A_new                               = res*A_new*pro;
+        A_cell{i}                           = A_new;
+        A_tril{i}                           = tril(A_new);
+        A_triu{i}                           = triu(A_new);
+    end
+
+    i =1;
+    pro                                     = prolongation_HB1(HB_cell{i+1});
+    res                                     = pro';
+    A_pro{2}                                = pro;
+    A_res{2}                                = res;
+    A_cell{1}                               = res*A_new*pro;
+
+    
+    for i = 1:30
+        tic;
+        r                                       = b - A*u;
+        r_list                                  = [r_list max(abs(r))];
+        e                                       = Vcycle(r,J,A_cell,A_tril,A_triu,A_pro,A_res,bdNode_cell,freeNode_cell);
+        u                                       = u+e;
+        toc;
+        t1                                      = toc;
+        if J == 3 
+            if i == 1
+                time_list_three = [t1];
+            else
+                time_list_three = [time_list_three t1+time_list_three(end)];
+            end
+        elseif J == 4 
+            if i == 1
+                time_list_four = [t1];
+            else
+                time_list_four = [time_list_four t1+time_list_four(end)];
+            end  
+        elseif J == 5     
+            if i == 1
+                time_list_five = [t1];
+            else
+                time_list_five = [time_list_five t1+time_list_five(end)];
+            end 
+        else
+            if i == 1
+                time_list_six = [t1];
+            else
+                time_list_six = [time_list_six t1+time_list_six(end)];
+            end 
+        end
+    end
+    
+end
+
+plot(time_list_three)
+hold on;
+plot(time_list_four)
+plot(time_list_five)
+plot(time_list_six)
+legend("three","four","five","six");
+title("time vers J = 3,4,5,6")
+
+##### SOURCE END #####
+--></body></html>
